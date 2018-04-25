@@ -51,7 +51,7 @@ class Logger():
         self.date_format = '%b/%d/%y | %H:%M:%S'
 
         # Default log directory
-        self.log_dir = "/var/repo/logs"
+        self.log_dir = "/tmp/logs"
 
         # Create the log directory if it does not exists
         if not os.path.exists(self.log_dir):
@@ -69,8 +69,11 @@ class Logger():
         # Define log instance
         self.log = logging.getLogger('root')
 
-        # Filename
+        # Module name
         self.filename = filename
+
+        # Filename
+        self.log.file_handle = None
 
         # Invoke Console Logging
         self.console_logger(self.filename)
@@ -105,7 +108,7 @@ class Logger():
         for each in list(logging.root.handlers):
             each = str(each)
 
-            if each.split(" ")[0].split(".")[1] == "StreamHandler":
+            if each.split(" ")[0].split("<")[1] == "StreamHandler":
                 found = True
                 break
 
@@ -116,7 +119,7 @@ class Logger():
             self.log.root.addHandler(console_handler)
 
         # Fetch the name of logger
-        name = name.split('.')[-1]
+        self.filename = self.filename.split('.')[-1]
 
         return self.log
 
@@ -153,7 +156,7 @@ class Logger():
         for each in list(logging.root.handlers):
             each = str(each)
 
-            if each.split(" ")[0].split(".")[1] == "FileHandler":
+            if each.split(" ")[0].split("<")[1] == "FileHandler":
                 found = True
                 break
 
@@ -163,5 +166,6 @@ class Logger():
             file_handle = logging.FileHandler(self.log_dir + '/' + self.filename + '_' + file_suffix + '.log')
             file_handle.setFormatter(self.formatter)
             self.log.root.addHandler(file_handle)
+            self.log.file_handle = file_handle
 
         return self.log
